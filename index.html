@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Andre.Fit</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#070709;color:#e0e0ee;font-family:'Barlow Condensed',sans-serif;min-height:100vh}
+  ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:#FF4D00;border-radius:2px}
+
+  /* HEADER */
+  #header{position:sticky;top:0;z-index:100;background:#09090f;border-bottom:1px solid #141422;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+  .logo{font-size:20px;font-weight:900;letter-spacing:3px;color:#FF4D00}
+  .logo span{color:#e0e0ee;font-size:15px}
+  .logo-sub{font-family:'Barlow',sans-serif;font-size:10px;color:#444;letter-spacing:2px;margin-top:2px}
+  .nav-icons{display:flex;gap:6px}
+  .nav-btn{background:#111119;border:1px solid #1c1c28;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:16px;color:#fff;transition:all .2s}
+  .nav-btn.active{background:#FF4D00;border-color:#FF4D00}
+
+  /* LAYOUT */
+  #content{max-width:640px;margin:0 auto;padding:18px 14px 90px}
+  .page{display:none}.page.active{display:block}
+
+  /* CARDS */
+  .card{background:#0f0f15;border:1px solid #1c1c28;border-radius:10px;margin-bottom:12px}
+  .card-body{padding:16px}
+  .section-label{font-family:'Barlow',sans-serif;font-size:10px;letter-spacing:3px;margin-bottom:5px}
+  .title{font-size:46px;font-weight:900;line-height:.95;margin-bottom:14px}
+
+  /* GRID STATS */
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .stat{background:#0c0c14;border:1px solid #1a1a26;border-radius:8px;padding:12px;text-align:center}
+  .stat-val{font-size:20px;font-weight:900}
+  .stat-lbl{font-family:'Barlow',sans-serif;font-size:9px;color:#555;letter-spacing:1px;margin-top:3px}
+  .stat-sub{font-family:'Barlow',sans-serif;font-size:8px;color:#444;margin-top:1px}
+
+  /* ALERTS */
+  .alert-row{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #0f0f18}
+  .alert-row:last-child{border-bottom:none}
+  .alert-txt{font-family:'Barlow',sans-serif;font-size:12px;color:#888;line-height:1.5}
+
+  /* PROGRESS BAR */
+  .pb-wrap{background:#161622;border-radius:100px;overflow:hidden}
+  .pb-fill{height:100%;border-radius:100px;transition:width .4s}
+
+  /* WEEK TABS */
+  .week-tabs{display:flex;gap:6px;margin-bottom:16px}
+  .week-tab{background:#14141e;border:1px solid #222230;border-radius:6px;padding:7px 12px;cursor:pointer;font-family:'Barlow Condensed';font-size:13px;letter-spacing:1px;color:#666;transition:all .2s}
+  .week-tab.active{background:#FF4D00;border-color:#FF4D00;color:#fff}
+
+  /* DAY ACCORDION */
+  .day-card{background:#0f0f15;border:1px solid #1c1c28;border-radius:10px;margin-bottom:8px;overflow:hidden}
+  .day-header{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;cursor:pointer;transition:background .15s}
+  .day-header:hover{background:#141420}
+  .day-info{display:flex;align-items:center;gap:10px}
+  .day-icon{font-size:22px}
+  .day-name{font-family:'Barlow',sans-serif;font-size:11px;color:#555}
+  .day-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-family:'Barlow',sans-serif;font-size:10px;font-weight:500;margin-left:6px}
+  .focus-badge{background:#FFB80022;border:1px solid #FFB80055;border-radius:4px;padding:2px 6px;font-size:9px;color:#FFB800;font-family:'Barlow';font-weight:600;letter-spacing:.5px;margin-left:4px}
+  .day-progress{margin-top:5px}
+  .day-progress-bar{width:160px}
+  .day-progress-txt{font-family:'Barlow',sans-serif;font-size:9px;color:#444;margin-top:3px}
+  .chevron{color:#333;font-size:14px}
+  .exercises{border-top:1px solid #141422;display:none}
+  .exercises.open{display:block}
+  .ex-row{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid #0e0e18;cursor:pointer;transition:background .15s}
+  .ex-row:hover{background:#141420}
+  .ex-row:last-child{border-bottom:none}
+  .cb{width:22px;height:22px;border-radius:5px;border:2px solid #282838;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;margin-top:2px}
+  .cb.done{background:#00FF88;border-color:#00FF88}
+  .ex-name{font-family:'Barlow',sans-serif;font-size:13px;color:#ccc;transition:all .2s}
+  .ex-name.done{color:#444;text-decoration:line-through}
+  .ex-tip{font-family:'Barlow',sans-serif;font-size:10px;color:#FFB800;margin-top:2px}
+  .ex-tags{display:flex;gap:6px;margin-top:4px}
+  .tag{background:#141422;border-radius:4px;padding:2px 8px;font-family:'Barlow',sans-serif;font-size:10px;color:#666}
+  .complete-bar{padding:12px 16px;background:#001a0d;text-align:center;font-family:'Barlow',sans-serif;color:#00FF88;font-size:14px;border-top:1px solid #00FF8820;display:none}
+
+  /* MEALS */
+  .meal-card{background:#0f0f15;border:1px solid #1c1c28;border-radius:10px;margin-bottom:10px;overflow:hidden}
+  .meal-header{padding:11px 15px;display:flex;justify-content:space-between;align-items:center}
+  .meal-name{font-size:16px;font-weight:700;letter-spacing:1px}
+  .meal-time{font-family:'Barlow',sans-serif;font-size:10px;color:#555}
+  .meal-kcal{font-size:22px;font-weight:900}
+  .meal-kcal-lbl{font-family:'Barlow',sans-serif;font-size:9px;color:#555;text-align:right}
+  .food-row{display:flex;justify-content:space-between;align-items:center;padding:8px 15px;border-bottom:1px solid #0e0e18}
+  .food-name{font-family:'Barlow',sans-serif;font-size:13px;color:#bbb}
+  .food-qty{font-family:'Barlow',sans-serif;font-size:10px;color:#444}
+  .macros{display:flex;gap:4px}
+  .macro{border-radius:4px;padding:2px 5px;font-family:'Barlow',sans-serif;font-size:9px}
+  .tip-box{background:#0d0d1a;border-left:2px solid #FFB800;padding:8px 12px;margin:8px 14px 12px;border-radius:0 6px 6px 0;font-family:'Barlow',sans-serif;font-size:11px;color:#999;line-height:1.5}
+
+  /* GUIDE */
+  .guide-card{background:#0f0f15;border:1px solid #1c1c28;border-radius:10px;margin-bottom:14px;overflow:hidden}
+  .guide-header{padding:14px 16px}
+  .guide-mes{font-family:'Barlow',sans-serif;font-size:10px;letter-spacing:2px;margin-bottom:4px}
+  .guide-title{font-size:28px;font-weight:900;letter-spacing:2px}
+  .guide-meta{font-family:'Barlow',sans-serif;font-size:11px;color:#555;margin-top:6px}
+  .guide-body{padding:16px}
+  .guide-section-lbl{font-size:11px;letter-spacing:2px;margin-bottom:10px}
+  .guide-item{display:flex;gap:10px;margin-bottom:8px}
+  .guide-num{width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-family:'Barlow',sans-serif;font-size:9px;font-weight:700}
+  .guide-txt{font-family:'Barlow',sans-serif;font-size:12px;color:#888;line-height:1.5}
+  .divider{height:1px;background:#141422;margin:14px 0}
+
+  /* SUPP TABLE */
+  .supp-row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid #0f0f18}
+  .supp-row:last-child{border-bottom:none}
+  .supp-name{font-family:'Barlow',sans-serif;font-size:13px;font-weight:600;color:#ddd}
+  .supp-why{font-family:'Barlow',sans-serif;font-size:11px;color:#555;margin-top:2px}
+  .supp-dose{border-radius:5px;padding:3px 8px;font-family:'Barlow',sans-serif;font-size:10px;flex-shrink:0;margin-left:8px;align-self:center}
+
+  /* BIO TOGGLE */
+  .bio-toggle{background:#0f0f15;border:1px solid #1c1c28;border-radius:10px;padding:12px 16px;width:100%;cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;text-align:left}
+  .bio-toggle-title{font-size:13px;letter-spacing:2px;color:#e0e0ee}
+  .bio-toggle-sub{font-family:'Barlow',sans-serif;font-size:11px;color:#555;margin-top:3px}
+  .bio-detail{display:none;margin-bottom:14px}
+  .bio-detail.open{display:block}
+
+  /* BOTTOM NAV */
+  #bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#08080e;border-top:1px solid #141422;display:flex;justify-content:space-around;padding:10px 0 14px;z-index:100}
+  .bnav-btn{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 10px}
+  .bnav-icon{font-size:20px;opacity:.3;transition:opacity .2s;color:#fff}
+  .bnav-icon.active{opacity:1;color:#FF4D00}
+  .bnav-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;color:#444;transition:color .2s}
+  .bnav-lbl.active{color:#FF4D00}
+
+  /* CALORIE BOX */
+  .cal-box{background:#0a0a12;border-radius:8px;padding:12px 10px;text-align:center}
+  .cal-val{font-size:26px;font-weight:900}
+  .cal-unit{font-family:'Barlow',sans-serif;font-size:9px;color:#555}
+  .cal-lbl{font-family:'Barlow',sans-serif;font-size:9px;color:#444;margin-top:2px}
+
+  /* OBJECTIVE TABLE */
+  .obj-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #0f0f18}
+  .obj-row:last-child{border-bottom:none}
+  .obj-lbl{font-family:'Barlow',sans-serif;font-size:13px;color:#666}
+  .obj-val{font-size:15px;font-weight:700}
+  .obj-from{font-family:'Barlow',sans-serif;font-size:11px;color:#333}
+
+  /* SEG TABLE */
+  .seg-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #141422}
+  .seg-row:last-child{border-bottom:none}
+  .seg-region{font-family:'Barlow',sans-serif;font-size:12px;color:#888}
+  .seg-data{font-family:'Barlow',sans-serif;font-size:11px;color:#555}
+  .seg-status{font-family:'Barlow',sans-serif;font-size:10px}
+
+  /* REEVAL */
+  .reeval-row{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #0f0f18;align-items:center}
+  .reeval-row:last-child{border-bottom:none}
+  .reeval-time{border-radius:6px;padding:6px 10px;text-align:center;flex-shrink:0;min-width:60px}
+  .reeval-time-val{font-size:14px;font-weight:900}
+  .reeval-txt{font-family:'Barlow',sans-serif;font-size:12px;color:#888;line-height:1.5}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <div>
+    <div class="logo">ANDRE<span>/FIT</span></div>
+    <div class="logo-sub">BIOIMPEDÂNCIA · 31/03/2026</div>
+  </div>
+  <div class="nav-icons">
+    <button class="nav-btn active" onclick="showPage('home',this)" title="Início">🏠</button>
+    <button class="nav-btn" onclick="showPage('treinos',this)" title="Treinos">💪</button>
+    <button class="nav-btn" onclick="showPage('alimentacao',this)" title="Alimentação">🥗</button>
+    <button class="nav-btn" onclick="showPage('guia',this)" title="Guia">📋</button>
+  </div>
+</div>
+
+<div id="content">
+
+<!-- ══════════════════ HOME ══════════════════ -->
+<div id="page-home" class="page active">
+
+  <!-- Hero -->
+  <div style="margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid #141422">
+    <div class="section-label" style="color:#FF4D00">RELATÓRIO RELAXMEDIC · 31/03/2026</div>
+    <div class="title">ANDRE<br><span style="color:#FF4D00;font-size:64px">80</span><span style="color:#333;font-size:28px;font-weight:400">/100pts</span></div>
+    <div style="font-family:'Barlow',sans-serif;color:#555;font-size:13px">Composição corporal por bioimpedância real</div>
+  </div>
+
+  <!-- Diagnóstico -->
+  <div class="section-label" style="color:#333;margin-bottom:10px">DIAGNÓSTICO PERSONALIZADO</div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-body" style="padding:12px 14px">
+      <div class="alert-row"><span style="font-size:15px;flex-shrink:0">⚠️</span><div class="alert-txt">Gordura concentrada no <strong style="color:#FFB800">tronco</strong> (5.3kg = 48% de toda a gordura) — principal foco do plano</div></div>
+      <div class="alert-row"><span style="font-size:15px;flex-shrink:0">⚠️</span><div class="alert-txt">Braços com gordura abaixo do padrão (70%) — não reduza mais a gordura dos braços</div></div>
+      <div class="alert-row"><span style="font-size:15px;flex-shrink:0">✅</span><div class="alert-txt">IMC <strong style="color:#00FF88">22.3</strong> — peso saudável, não está acima do peso</div></div>
+      <div class="alert-row"><span style="font-size:15px;flex-shrink:0">✅</span><div class="alert-txt">Gordura visceral <strong style="color:#00FF88">grau 3</strong> — excelente, risco cardiovascular baixo</div></div>
+      <div class="alert-row"><span style="font-size:15px;flex-shrink:0">✅</span><div class="alert-txt">Idade corporal <strong style="color:#00FF88">23 anos</strong> — 2 anos mais jovem que a idade real!</div></div>
+      <div class="alert-row" style="border:none"><span style="font-size:15px;flex-shrink:0">🎯</span><div class="alert-txt">Foco: <strong style="color:#FFB800">recomposição</strong> — secar gordura do tronco + ganhar músculo nas pernas</div></div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid-4">
+    <div class="stat"><div class="stat-val" style="color:#FF4D00">77.1kg</div><div class="stat-lbl">PESO</div></div>
+    <div class="stat"><div class="stat-val" style="color:#00C6FF">186cm</div><div class="stat-lbl">ALTURA</div></div>
+    <div class="stat"><div class="stat-val" style="color:#00FF88">22.3</div><div class="stat-lbl">IMC</div></div>
+    <div class="stat"><div class="stat-val" style="color:#FFB800">80/100</div><div class="stat-lbl">PONTOS</div></div>
+  </div>
+  <div class="grid-4">
+    <div class="stat"><div class="stat-val" style="color:#FF8C00;font-size:16px">14.3%</div><div class="stat-lbl">GORDURA</div><div class="stat-sub">11.0kg · saudável</div></div>
+    <div class="stat"><div class="stat-val" style="color:#00FF88;font-size:16px">61.7kg</div><div class="stat-lbl">MÚSCULO</div><div class="stat-sub">80% · saudável</div></div>
+    <div class="stat"><div class="stat-val" style="color:#00C6FF;font-size:16px">23 anos</div><div class="stat-lbl">IDADE CORP.</div><div class="stat-sub">+2 jovem!</div></div>
+    <div class="stat"><div class="stat-val" style="color:#888;font-size:16px">Grau 3</div><div class="stat-lbl">GORD. VISC.</div><div class="stat-sub">excelente</div></div>
+  </div>
+
+  <!-- Calorias -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-body">
+      <div class="section-label" style="color:#FF4D00;margin-bottom:12px">CALORIAS — DADOS REAIS DO APARELHO</div>
+      <div class="grid-3" style="margin-bottom:0">
+        <div class="cal-box"><div class="cal-val" style="color:#888">1.797</div><div class="cal-unit">kcal/dia</div><div class="cal-lbl">TMB medida</div></div>
+        <div class="cal-box"><div class="cal-val" style="color:#FF4D00">2.785</div><div class="cal-unit">kcal/dia</div><div class="cal-lbl">TDEE c/ treino</div></div>
+        <div class="cal-box"><div class="cal-val" style="color:#00FF88">2.485</div><div class="cal-unit">kcal/dia</div><div class="cal-lbl">Meta (-300 kcal)</div></div>
+      </div>
+      <div style="margin-top:12px;font-family:'Barlow',sans-serif;font-size:11px;color:#555;line-height:1.6;padding-top:12px;border-top:1px solid #141422">
+        ⚡ Déficit de apenas 300 kcal porque você já está em 14.3% — déficit agressivo queimaria o músculo das pernas.
+      </div>
+    </div>
+  </div>
+
+  <!-- Gordura Segmentar toggle -->
+  <button class="bio-toggle" onclick="toggleBio()">
+    <div>
+      <div class="bio-toggle-title">GORDURA SEGMENTAR DETALHADA</div>
+      <div class="bio-toggle-sub">Dados exatos por região do corpo ▼</div>
+    </div>
+    <span id="bio-chevron" style="color:#444;font-size:18px">▼</span>
+  </button>
+  <div id="bio-detail" class="bio-detail card">
+    <div class="card-body">
+      <div class="grid-2" style="margin-bottom:0">
+        <div>
+          <div class="section-label" style="color:#FF4D00;margin-bottom:8px">GORDURA POR REGIÃO</div>
+          <div class="seg-row"><span class="seg-region">Braço Esq.</span><span class="seg-data">0.5kg · 70.1%</span><span class="seg-status" style="color:#FFB800">⚠️ Baixo</span></div>
+          <div class="seg-row"><span class="seg-region">Braço Dir.</span><span class="seg-data">0.5kg · 68.6%</span><span class="seg-status" style="color:#FFB800">⚠️ Baixo</span></div>
+          <div class="seg-row"><span class="seg-region">Tronco</span><span class="seg-data">5.3kg · 109%</span><span class="seg-status" style="color:#FF4D00">🎯 Foco</span></div>
+          <div class="seg-row"><span class="seg-region">Perna Esq.</span><span class="seg-data">1.8kg · 95.8%</span><span class="seg-status" style="color:#00FF88">✅ OK</span></div>
+          <div class="seg-row"><span class="seg-region">Perna Dir.</span><span class="seg-data">1.8kg · 95.9%</span><span class="seg-status" style="color:#00FF88">✅ OK</span></div>
+        </div>
+        <div>
+          <div class="section-label" style="color:#00FF88;margin-bottom:8px">MÚSCULO POR REGIÃO</div>
+          <div class="seg-row"><span class="seg-region">Braço Esq.</span><span class="seg-data">3.7kg · 104%</span><span class="seg-status" style="color:#00FF88">✅</span></div>
+          <div class="seg-row"><span class="seg-region">Braço Dir.</span><span class="seg-data">3.7kg · 104%</span><span class="seg-status" style="color:#00FF88">✅</span></div>
+          <div class="seg-row"><span class="seg-region">Tronco</span><span class="seg-data">28.8kg · 103%</span><span class="seg-status" style="color:#00FF88">✅</span></div>
+          <div class="seg-row"><span class="seg-region">Perna Esq.</span><span class="seg-data">10.9kg · 111%</span><span class="seg-status" style="color:#00C6FF">↑ Forte</span></div>
+          <div class="seg-row"><span class="seg-region">Perna Dir.</span><span class="seg-data">10.9kg · 111%</span><span class="seg-status" style="color:#00C6FF">↑ Forte</span></div>
+        </div>
+      </div>
+      <div style="margin-top:12px;background:#0a0a12;border-radius:8px;padding:10px 12px;font-family:'Barlow',sans-serif;font-size:11px;color:#666;line-height:1.6">
+        🔬 <strong style="color:#FFB800">Relaxmedic:</strong> Distribuição desequilibrada de gordura. Alto teor no tronco. Fortaleça pernas e faça exercícios de queima no tronco.
+      </div>
+    </div>
+  </div>
+
+  <!-- Metas -->
+  <div class="card">
+    <div class="card-body">
+      <div class="section-label" style="color:#FF4D00;margin-bottom:12px">METAS EM 3 MESES</div>
+      <div class="obj-row"><span class="obj-lbl">Gordura tronco</span><div><span class="obj-from">5.3kg →</span> <span class="obj-val" style="color:#FF4D00">~4.3kg</span></div></div>
+      <div class="obj-row"><span class="obj-lbl">% Gordura corporal</span><div><span class="obj-from">14.3% →</span> <span class="obj-val" style="color:#FF8C00">~11-12%</span></div></div>
+      <div class="obj-row"><span class="obj-lbl">Músculo esquelético</span><div><span class="obj-from">37.8kg →</span> <span class="obj-val" style="color:#00FF88">~39-40kg</span></div></div>
+      <div class="obj-row"><span class="obj-lbl">WHR cintura/quadril</span><div><span class="obj-from">0.85 →</span> <span class="obj-val" style="color:#00C6FF">~0.80</span></div></div>
+      <div class="obj-row" style="border:none"><span class="obj-lbl">Proteína corporal</span><div><span class="obj-from">13.2kg →</span> <span class="obj-val" style="color:#8B00FF">~14-14.5kg</span></div></div>
+    </div>
+  </div>
+
+</div><!-- /home -->
+
+
+<!-- ══════════════════ TREINOS ══════════════════ -->
+<div id="page-treinos" class="page">
+
+  <div style="margin-bottom:18px">
+    <div class="section-label" style="color:#FF4D00">DIVISÃO SEMANAL</div>
+    <div class="title">SEUS<br><span style="color:#FF4D00">TREINOS</span></div>
+    <div style="font-family:'Barlow',sans-serif;color:#555;font-size:12px;line-height:1.7">
+      🎯 <span style="color:#FFB800">Queimar gordura do tronco</span> + <span style="color:#8B00FF">Desenvolver pernas</span>
+    </div>
+  </div>
+
+  <div class="week-tabs">
+    <button class="week-tab active" onclick="showWeek('s1',this)">SEM 1-4</button>
+    <button class="week-tab" onclick="showWeek('s2',this)">SEM 5-8</button>
+    <button class="week-tab" onclick="showWeek('s3',this)">SEM 9-12</button>
+  </div>
+
+  <!-- SEMANA 1-4 -->
+  <div id="week-s1" class="week-content">
+
+    <div class="day-card">
+      <div class="day-header" onclick="toggleDay('s1d1')">
+        <div class="day-info">
+          <span class="day-icon">💪</span>
+          <div>
+            <div><span class="day-name">Segunda</span><span class="day-badge" style="background:#FF4D018;color:#FF4D00">PEITO + TRÍCEPS</span></div>
+            <div class="day-progress"><div class="pb-wrap day-progress-bar" style="height:3px"><div class="pb-fill" id="prog-s1d1" style="width:0%;background:#FF4D00"></div></div><div class="day-progress-txt" id="txt-s1d1">0/6 exercícios</div></div>
+          </div>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="exercises" id="ex-s1d1">
+        <div class="ex-row" onclick="toggleEx(this,'s1d1',6)"><div class="cb"></div><div><div class="ex-name">Supino Reto com Barra</div><div class="ex-tags"><span class="tag">4×10</span><span class="tag">⏱ 90s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d1',6)"><div class="cb"></div><div><div class="ex-name">Supino Inclinado Halteres</div><div class="ex-tags"><span class="tag">3×12</span><span class="tag">⏱ 75s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d1',6)"><div class="cb"></div><div><div class="ex-name">Crossover Cabo</div><div class="ex-tags"><span class="tag">3×15</span><span class="tag">⏱ 60s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d1',6)"><div class="cb"></div><div><div class="ex-name">Tríceps Corda</div><div class="ex-tags"><span class="tag">4×12</span><span class="tag">⏱ 60s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d1',6)"><div class="cb"></div><div><div class="ex-name">Tríceps Francês</div><div class="ex-tags"><span class="tag">3×12</span><span class="tag">⏱ 60s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d1',6)"><div class="cb"></div><div><div class="ex-name">Mergulho Paralelas</div><div class="ex-tags"><span class="tag">3×10</span><span class="tag">⏱ 90s</span></div></div></div>
+        <div class="complete-bar" id="done-s1d1">💪 Treino completo! Ótimo trabalho, Andre!</div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header" onclick="toggleDay('s1d2')">
+        <div class="day-info">
+          <span class="day-icon">🏋️</span>
+          <div>
+            <div><span class="day-name">Terça</span><span class="day-badge" style="color:#00C6FF">COSTAS + BÍCEPS</span></div>
+            <div class="day-progress"><div class="pb-wrap day-progress-bar" style="height:3px"><div class="pb-fill" id="prog-s1d2" style="width:0%;background:#00C6FF"></div></div><div class="day-progress-txt" id="txt-s1d2">0/6 exercícios</div></div>
+          </div>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="exercises" id="ex-s1d2">
+        <div class="ex-row" onclick="toggleEx(this,'s1d2',6)"><div class="cb"></div><div><div class="ex-name">Puxada Frontal</div><div class="ex-tags"><span class="tag">4×10</span><span class="tag">⏱ 90s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d2',6)"><div class="cb"></div><div><div class="ex-name">Remada Curvada Barra</div><div class="ex-tags"><span class="tag">4×10</span><span class="tag">⏱ 90s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d2',6)"><div class="cb"></div><div><div class="ex-name">Remada Unilateral Haltere</div><div class="ex-tags"><span class="tag">3×12</span><span class="tag">⏱ 75s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d2',6)"><div class="cb"></div><div><div class="ex-name">Rosca Direta Barra</div><div class="ex-tags"><span class="tag">4×10</span><span class="tag">⏱ 60s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d2',6)"><div class="cb"></div><div><div class="ex-name">Rosca Alternada Haltere</div><div class="ex-tags"><span class="tag">3×12</span><span class="tag">⏱ 60s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d2',6)"><div class="cb"></div><div><div class="ex-name">Rosca Concentrada</div><div class="ex-tags"><span class="tag">3×12</span><span class="tag">⏱ 60s</span></div></div></div>
+        <div class="complete-bar" id="done-s1d2">💪 Treino completo! Ótimo trabalho, Andre!</div>
+      </div>
+    </div>
+
+    <div class="day-card" style="border-color:#1e1a10">
+      <div class="day-header" onclick="toggleDay('s1d3')">
+        <div class="day-info">
+          <span class="day-icon">🦵</span>
+          <div>
+            <div><span class="day-name">Quarta</span><span class="day-badge" style="color:#8B00FF">PERNAS — PRIORIDADE</span><span class="focus-badge">FOCO</span></div>
+            <div class="day-progress"><div class="pb-wrap day-progress-bar" style="height:3px"><div class="pb-fill" id="prog-s1d3" style="width:0%;background:#8B00FF"></div></div><div class="day-progress-txt" id="txt-s1d3">0/7 exercícios</div></div>
+          </div>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="exercises" id="ex-s1d3">
+        <div class="ex-row" onclick="toggleEx(this,'s1d3',7)"><div class="cb"></div><div><div class="ex-name">Agachamento Livre</div><div class="ex-tip">⭐ Prioridade — volume máximo para pernas!</div><div class="ex-tags"><span class="tag">5×10</span><span class="tag">⏱ 120s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d3',7)"><div class="cb"></div><div><div class="ex-name">Leg Press 45°</div><div class="ex-tags"><span class="tag">4×12</span><span class="tag">⏱ 90s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d3',7)"><div class="cb"></div><div><div class="ex-name">Cadeira Extensora</div><div class="ex-tags"><span class="tag">4×15</span><span class="tag">⏱ 60s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d3',7)"><div class="cb"></div><div><div class="ex-name">Cadeira Flexora</div><div class="ex-tags"><span class="tag">4×15</span><span class="tag">⏱ 60s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d3',7)"><div class="cb"></div><div><div class="ex-name">Stiff com Halteres</div><div class="ex-tags"><span class="tag">3×12</span><span class="tag">⏱ 75s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d3',7)"><div class="cb"></div><div><div class="ex-name">Avanço Alternado</div><div class="ex-tags"><span class="tag">3×12/lado</span><span class="tag">⏱ 60s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d3',7)"><div class="cb"></div><div><div class="ex-name">Panturrilha em Pé</div><div class="ex-tags"><span class="tag">4×20</span><span class="tag">⏱ 45s</span></div></div></div>
+        <div class="complete-bar" id="done-s1d3">🦵 Pernas completas! Excelente, Andre!</div>
+      </div>
+    </div>
+
+    <div class="day-card" style="border-color:#1e1a10">
+      <div class="day-header" onclick="toggleDay('s1d4')">
+        <div class="day-info">
+          <span class="day-icon">🎯</span>
+          <div>
+            <div><span class="day-name">Quinta</span><span class="day-badge" style="color:#FFB800">OMBROS + CORE</span><span class="focus-badge">FOCO</span></div>
+            <div class="day-progress"><div class="pb-wrap day-progress-bar" style="height:3px"><div class="pb-fill" id="prog-s1d4" style="width:0%;background:#FFB800"></div></div><div class="day-progress-txt" id="txt-s1d4">0/7 exercícios</div></div>
+          </div>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="exercises" id="ex-s1d4">
+        <div class="ex-row" onclick="toggleEx(this,'s1d4',7)"><div class="cb"></div><div><div class="ex-name">Desenvolvimento Halteres</div><div class="ex-tags"><span class="tag">4×10</span><span class="tag">⏱ 90s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d4',7)"><div class="cb"></div><div><div class="ex-name">Elevação Lateral</div><div class="ex-tags"><span class="tag">4×15</span><span class="tag">⏱ 60s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d4',7)"><div class="cb"></div><div><div class="ex-name">Face Pull Cabo</div><div class="ex-tags"><span class="tag">3×15</span><span class="tag">⏱ 60s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d4',7)"><div class="cb"></div><div><div class="ex-name">Prancha Frontal</div><div class="ex-tip">⭐ Estabiliza core e queima tronco</div><div class="ex-tags"><span class="tag">4×45s</span><span class="tag">⏱ 60s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d4',7)"><div class="cb"></div><div><div class="ex-name">Abdominal Bicicleta</div><div class="ex-tags"><span class="tag">3×25</span><span class="tag">⏱ 45s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d4',7)"><div class="cb"></div><div><div class="ex-name">Russian Twist com Peso</div><div class="ex-tip">Reduz circunferência abdominal</div><div class="ex-tags"><span class="tag">3×20</span><span class="tag">⏱ 45s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d4',7)"><div class="cb"></div><div><div class="ex-name">Elevação de Pernas Suspenso</div><div class="ex-tags"><span class="tag">3×15</span><span class="tag">⏱ 60s</span></div></div></div>
+        <div class="complete-bar" id="done-s1d4">🔥 Core e ombros completos!</div>
+      </div>
+    </div>
+
+    <div class="day-card" style="border-color:#1e1a10">
+      <div class="day-header" onclick="toggleDay('s1d5')">
+        <div class="day-info">
+          <span class="day-icon">🔥</span>
+          <div>
+            <div><span class="day-name">Sexta</span><span class="day-badge" style="color:#FF4D00">HIIT + TRONCO</span><span class="focus-badge">FOCO</span></div>
+            <div class="day-progress"><div class="pb-wrap day-progress-bar" style="height:3px"><div class="pb-fill" id="prog-s1d5" style="width:0%;background:#FF4D00"></div></div><div class="day-progress-txt" id="txt-s1d5">0/6 exercícios</div></div>
+          </div>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="exercises" id="ex-s1d5">
+        <div class="ex-row" onclick="toggleEx(this,'s1d5',6)"><div class="cb"></div><div><div class="ex-name">Burpees</div><div class="ex-tip">⭐ Queima gordura do tronco com eficiência</div><div class="ex-tags"><span class="tag">4×12</span><span class="tag">⏱ 60s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d5',6)"><div class="cb"></div><div><div class="ex-name">Mountain Climbers</div><div class="ex-tags"><span class="tag">4×40s</span><span class="tag">⏱ 45s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d5',6)"><div class="cb"></div><div><div class="ex-name">Kettlebell Swing</div><div class="ex-tags"><span class="tag">4×15</span><span class="tag">⏱ 60s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d5',6)"><div class="cb"></div><div><div class="ex-name">Pular Corda</div><div class="ex-tags"><span class="tag">5×1min</span><span class="tag">⏱ 45s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d5',6)"><div class="cb"></div><div><div class="ex-name">Prancha com Rotação</div><div class="ex-tags"><span class="tag">3×10/lado</span><span class="tag">⏱ 60s</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d5',6)"><div class="cb"></div><div><div class="ex-name">Deadlift Romeno</div><div class="ex-tags"><span class="tag">3×10</span><span class="tag">⏱ 90s</span></div></div></div>
+        <div class="complete-bar" id="done-s1d5">🔥 HIIT completo! Gordura do tronco agradece!</div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header" onclick="toggleDay('s1d6')">
+        <div class="day-info"><span class="day-icon">🏃</span><div><div><span class="day-name">Sábado</span><span class="day-badge" style="color:#FF69B4">CARDIO ZONA 2</span></div><div class="day-progress"><div class="pb-wrap day-progress-bar" style="height:3px"><div class="pb-fill" id="prog-s1d6" style="width:0%;background:#FF69B4"></div></div><div class="day-progress-txt" id="txt-s1d6">0/3 exercícios</div></div></div></div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="exercises" id="ex-s1d6">
+        <div class="ex-row" onclick="toggleEx(this,'s1d6',3)"><div class="cb"></div><div><div class="ex-name">Corrida Leve 30min (FC 120-140bpm)</div><div class="ex-tags"><span class="tag">30min</span><span class="tag">Zona 2</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d6',3)"><div class="cb"></div><div><div class="ex-name">Caminhada Inclinada</div><div class="ex-tags"><span class="tag">15min</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d6',3)"><div class="cb"></div><div><div class="ex-name">Alongamento + Foam Roller</div><div class="ex-tags"><span class="tag">15min</span></div></div></div>
+        <div class="complete-bar" id="done-s1d6">🏃 Cardio completo!</div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header" onclick="toggleDay('s1d7')">
+        <div class="day-info"><span class="day-icon">😴</span><div><div><span class="day-name">Domingo</span><span class="day-badge" style="color:#666">RECUPERAÇÃO ATIVA</span></div><div class="day-progress"><div class="pb-wrap day-progress-bar" style="height:3px"><div class="pb-fill" id="prog-s1d7" style="width:0%;background:#666"></div></div><div class="day-progress-txt" id="txt-s1d7">0/2 exercícios</div></div></div></div>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="exercises" id="ex-s1d7">
+        <div class="ex-row" onclick="toggleEx(this,'s1d7',2)"><div class="cb"></div><div><div class="ex-name">Caminhada Leve</div><div class="ex-tags"><span class="tag">20-30min</span></div></div></div>
+        <div class="ex-row" onclick="toggleEx(this,'s1d7',2)"><div class="cb"></div><div><div class="ex-name">Yoga / Mobilidade</div><div class="ex-tags"><span class="tag">20min</span></div></div></div>
+        <div class="complete-bar" id="done-s1d7">😴 Recuperação feita! Descanse bem!</div>
+      </div>
+    </div>
+
+  </div><!-- /week-s1 -->
+
+  <!-- SEMANA 5-8 -->
+  <div id="week-s2" class="week-content" style="display:none">
+    <div class="card"><div class="card-body" style="font-family:'Barlow',sans-serif;color:#888;font-size:13px;line-height:1.7">
+      <div style="font-size:16px;color:#FF4D00;margin-bottom:8px;font-weight:700">📈 Semana 5-8 — Progressão</div>
+      <b style="color:#ccc">Segunda:</b> Supino 5×8 (+carga), Crossover Alto+Baixo, Tríceps pesado<br>
+      <b style="color:#ccc">Terça:</b> Barra Fixa 5×6-8, Remada Cavalinho, Rosca 21s<br>
+      <b style="color:#8B00FF">Quarta (FOCO):</b> Agachamento Búlgaro 5×10, Leg Press +10kg, Avanço, Stiff<br>
+      <b style="color:#FFB800">Quinta (FOCO):</b> Arnold Press, Ab Wheel 4×12, Elevação Pernas<br>
+      <b style="color:#FF4D00">Sexta (FOCO):</b> Sprint 8×30s, Box Jump, Battle Rope, Farmer Walk<br>
+      <b style="color:#FF69B4">Sábado:</b> Corrida 35min + Bicicleta ergométrica<br>
+      <b style="color:#666">Domingo:</b> Natação ou Caminhada 30min
+    </div></div>
+  </div>
+
+  <!-- SEMANA 9-12 -->
+  <div id="week-s3" class="week-content" style="display:none">
+    <div class="card"><div class="card-body" style="font-family:'Barlow',sans-serif;color:#888;font-size:13px;line-height:1.7">
+      <div style="font-size:16px;color:#00FF88;margin-bottom:8px;font-weight:700">⚡ Semana 9-12 — Força Máxima</div>
+      <b style="color:#ccc">Segunda:</b> Supino 5×5 máximo, Fly, Tríceps pesado<br>
+      <b style="color:#ccc">Terça:</b> Barra Fixa lastrada, Remada Pendlay 4×6, Rosca máximo<br>
+      <b style="color:#8B00FF">Quarta (FOCO):</b> Agachamento 5×5 máximo, Hack Squat, Avanço c/ Barra, Stiff pesado<br>
+      <b style="color:#FFB800">Quinta (FOCO):</b> Desenvolvimento Militar 5×5, Dragon Flag, Ab Wheel avançado<br>
+      <b style="color:#FF4D00">Sexta (FOCO):</b> Deadlift 5×3-5 máximo, Sprint 10×20s, Sled Push<br>
+      <b style="color:#FF69B4">Sábado:</b> Corrida 40min contínua + Natação<br>
+      <b style="color:#666">Domingo:</b> Atividade ao ar livre + Meditação
+    </div></div>
+  </div>
+
+</div><!-- /treinos -->
+
+
+<!-- ══════════════════ ALIMENTAÇÃO ══════════════════ -->
+<div id="page-alimentacao" class="page">
+
+  <div style="margin-bottom:18px">
+    <div class="section-label" style="color:#00C6FF">PLANO ALIMENTAR</div>
+    <div class="title">DIETA<br><span style="color:#00C6FF">PERSONALIZADA</span></div>
+    <div style="font-family:'Barlow',sans-serif;color:#555;font-size:12px">~2.485 kcal/dia · 185g proteína · recomposição corporal</div>
+  </div>
+
+  <div class="grid-3">
+    <div class="stat"><div class="stat-val" style="color:#FF4D00">185g</div><div class="stat-lbl">PROTEÍNA</div><div class="stat-sub">2.4g/kg</div></div>
+    <div class="stat"><div class="stat-val" style="color:#00C6FF">280g</div><div class="stat-lbl">CARBOIDRATOS</div><div class="stat-sub">energia treino</div></div>
+    <div class="stat"><div class="stat-val" style="color:#FFB800">80g</div><div class="stat-lbl">GORDURAS BOAS</div><div class="stat-sub">ômega-3 + azeite</div></div>
+  </div>
+
+  <div class="meal-card">
+    <div class="meal-header" style="background:#FFB80012;border-bottom:1px solid #FFB80025">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">🌅</span><div><div class="meal-name" style="color:#FFB800">Café da Manhã</div><div class="meal-time">07:00</div></div></div>
+      <div><div class="meal-kcal">540</div><div class="meal-kcal-lbl">kcal</div></div>
+    </div>
+    <div class="food-row"><div><div class="food-name">Ovos inteiros mexidos</div><div class="food-qty">4 unidades</div></div><div class="macros"><span class="macro" style="background:#FF4D018;color:#FF4D00">P:28g</span><span class="macro" style="background:#00C6FF18;color:#00C6FF">C:0g</span><span class="macro" style="background:#FFB80018;color:#FFB800">G:20g</span></div></div>
+    <div class="food-row"><div><div class="food-name">Aveia em flocos</div><div class="food-qty">80g</div></div><div class="macros"><span class="macro" style="background:#FF4D018;color:#FF4D00">P:10g</span><span class="macro" style="background:#00C6FF18;color:#00C6FF">C:54g</span><span class="macro" style="background:#FFB80018;color:#FFB800">G:5g</span></div></div>
+    <div class="food-row"><div><div class="food-name">Banana</div><div class="food-qty">1 média</div></div><div class="macros"><span class="macro" style="background:#FF4D018;color:#FF4D00">P:1g</span><span class="macro" style="background:#00C6FF18;color:#00C6FF">C:27g</span><span class="macro" style="background:#FFB80018;color:#FFB800">G:0g</span></div></div>
+    <div class="food-row" style="border:none"><div><div class="food-name">Café preto sem açúcar</div><div class="food-qty">1 xícara</div></div><div class="macros"><span class="macro" style="background:#FF4D018;color:#FF4D00">P:0g</span></div></div>
+    <div class="tip-box">💡 Café da manhã proteico combate o cortisol matinal — principal responsável por acúmulo de gordura abdominal.</div>
+  </div>
+
+  <div class="meal-card">
+    <div class="meal-header" style="background:#FF8C0012;border-bottom:1px solid #FF8C0025">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">🥜</span><div><div class="meal-name" style="color:#FF8C00">Lanche da Manhã</div><div class="meal-time">10:00</div></div></div>
+      <div><div class="meal-kcal">300</div><div class="meal-kcal-lbl">kcal</div></div>
+    </div>
+    <div class="food-row"><div><div class="food-name">Iogurte grego integral</div><div class="food-qty">200g</div></div><div class="macros"><span class="macro" style="background:#FF4D018;color:#FF4D00">P:20g</span><span class="macro" style="background:#00C6FF18;color:#00C6FF">C:7g</span><span class="macro" style="background:#FFB80018;color:#FFB800">G:10g</span></div></div>
+    <div class="food-row"><div><div class="food-name">Castanha-do-pará</div><div class="food-qty">3 unidades</div></div><div class="macros"><span class="macro" style="background:#FF4D018;color:#FF4D00">P:2g</span><span class="macro" style="background:#FFB80018;color:#FFB800">G:9g</span></div></div>
+    <div class="food-row" style="border:none"><div><div class="food-name">Frutas vermelhas</div><div class="food-qty">100g</div></div><div class="macros"><span class="macro" style="background:#00C6FF18;color:#00C6FF">C:14g</span></div></div>
+    <div class="tip-box">💡 Iogurte grego tem caseína + whey natural — dupla proteica entre refeições.</div>
+  </div>
+
+  <div class="meal-card">
+    <div class="meal-header" style="background:#FF4D0012;border-bottom:1px solid #FF4D0025">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">🍗</span><div><div class="meal-name" style="color:#FF4D00">Almoço</div><div class="meal-time">12:30</div></div></div>
+      <div><div class="meal-kcal">700</div><div class="meal-kcal-lbl">kcal</div></div>
+    </div>
+    <div class="food-row"><div><div class="food-name">Frango grelhado</div><div class="food-qty">220g</div></div><div class="macros"><span class="macro" style="background:#FF4D018;color:#FF4D00">P:55g</span><span class="macro" style="background:#FFB80018;color:#FFB800">G:8g</span></div></div>
+    <div class="food-row"><div><div class="food-name">Arroz integral cozido</div><div class="food-qty">150g</div></div><div class="macros"><span class="macro" style="background:#FF4D018;color:#FF4D00">P:4g</span><span class="macro" style="background:#00C6FF18;color:#00C6FF">C:33g</span></div></div>
+    <div class="food-row"><div><div class="food-name">Feijão / Lentilha</div><div class="food-qty">100g cozido</div></div><div class="macros"><span class="macro" style="background:#FF4D018;color:#FF4D00">P:9g</span><span class="macro" style="background:#00C6FF18;color:#00C6FF">C:20g</span></div></div>
+    <div class="food-row"><div><div class="food-name">Brócolis + Salada verde</div><div class="food-qty">200g</div></div><div class="macros"><span class="macro" style="background:#FF4D018;color:#FF4D00">P:4g</span></div></div>
+    <div class="food-row" style="border:none"><div><div class="food-name">Azeite de oliva extra virgem</div><div class="food-qty">1 col. sopa</div></div><div class="macros"><span class="macro" style="background:#FFB80018;color:#FFB800">G:14g</span></div></div>
+    <div class="tip-box">💡 Refeição principal. O azeite reduz inflamação e melhora absorção de vitaminas. Priorize a proteína.</div>
+  </div>
+
+  <div class="meal-card">
+    <div class="meal-header" style="background:#00FF8812;border-bottom:1px solid #00FF8825">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">⚡</span><div><div class="meal-name" style="color:#00FF88">Pré-Treino</div><div class="meal-time">15:30</div></div></div>
+      <div><div class="meal-kcal">360</div><div class="meal-kcal-lbl">kcal</div></div>
+    </div>
+    <div class="food-row"><div><div class="food-name">Batata-doce cozida</div><div class="food-qty">180g</div></div><div class="macros"><span class="macro" style="background:#00C6FF18;color:#00C6FF">C:42g</span></div></div>
+    <div class="food-row"><div><div class="food-name">Atum em lata (água)</div><div class="food-qty">1 lata · 170g</div></div><div class="macros"><span class="macro" style="background:#FF4D018;color:#FF4D00">P:38g</span></div></div>
+    <div class="food-row" style="border:none"><div><div class="food-name">Azeite + limão</div><div class="food-qty">1 col. + 1/2</div></div><div class="macros"><span class="macro" style="background:#FFB80018;color:#FFB800">G:14g</span></div></div>
+    <div class="tip-box">💡 Batata-doce = carboidrato de baixo IG. Energia sustentada durante todo o treino. Coma 60-90min antes.</div>
+  </div>
+
+  <div class="meal-card">
+    <div class="meal-header" style="background:#00C6FF12;border-bottom:1px solid #00C6FF25">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">💥</span><div><div class="meal-name" style="color:#00C6FF">Pós-Treino</div><div class="meal-time">18:30</div></div></div>
+      <div><div class="meal-kcal">430</div><div class="meal-kcal-lbl">kcal</div></div>
+    </div>
+    <div class="food-row"><div><div class="food-name">Whey Protein Isolado</div><div class="food-qty">35g (1 scoop)</div></div><div class="macros"><span class="macro" style="background:#FF4D018;color:#FF4D00">P:28g</span></div></div>
+    <div class="food-row"><div><div class="food-name">Banana grande</div><div class="food-qty">1 unidade</div></div><div class="macros"><span class="macro" style="background:#00C6FF18;color:#00C6FF">C:31g</span></div></div>
+    <div class="food-row"><div><div class="food-name">Leite desnatado</div><div class="food-qty">250ml</div></div><div class="macros"><span class="macro" style="background:#FF4D018;color:#FF4D00">P:9g</span><span class="macro" style="background:#00C6FF18;color:#00C6FF">C:12g</span></div></div>
+    <div class="food-row" style="border:none"><div><div class="food-name">Creatina monohidratada</div><div class="food-qty">5g</div></div><div class="macros"><span class="macro" style="background:#00FF8818;color:#00FF88">⭐ essencial</span></div></div>
+    <div class="tip-box">💡 ⭐ Janela anabólica! Máximo 40min após o treino. Creatina pós-treino potencializa ganho nas pernas.</div>
+  </div>
+
+  <div class="meal-card">
+    <div class="meal-header" style="background:#8B00FF12;border-bottom:1px solid #8B00FF25">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">🌙</span><div><div class="meal-name" style="color:#8B00FF">Jantar</div><div class="meal-time">20:30</div></div></div>
+      <div><div class="meal-kcal">580</div><div class="meal-kcal-lbl">kcal</div></div>
+    </div>
+    <div class="food-row"><div><div class="food-name">Salmão grelhado</div><div class="food-qty">200g</div></div><div class="macros"><span class="macro" style="background:#FF4D018;color:#FF4D00">P:40g</span><span class="macro" style="background:#FFB80018;color:#FFB800">G:18g</span></div></div>
+    <div class="food-row"><div><div class="food-name">Quinoa cozida</div><div class="food-qty">120g</div></div><div class="macros"><span class="macro" style="background:#FF4D018;color:#FF4D00">P:5g</span><span class="macro" style="background:#00C6FF18;color:#00C6FF">C:25g</span></div></div>
+    <div class="food-row" style="border:none"><div><div class="food-name">Legumes refogados</div><div class="food-qty">200g</div></div><div class="macros"><span class="macro" style="background:#00C6FF18;color:#00C6FF">C:10g</span></div></div>
+    <div class="tip-box">💡 Salmão rico em ômega-3 reduz inflamação do tronco e melhora recuperação muscular.</div>
+  </div>
+
+  <div class="meal-card">
+    <div class="meal-header" style="background:#33333312;border-bottom:1px solid #33333325">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">🥛</span><div><div class="meal-name" style="color:#999">Ceia (opcional)</div><div class="meal-time">22:00</div></div></div>
+      <div><div class="meal-kcal">190</div><div class="meal-kcal-lbl">kcal</div></div>
+    </div>
+    <div class="food-row" style="border:none"><div><div class="food-name">Queijo cottage</div><div class="food-qty">180g</div></div><div class="macros"><span class="macro" style="background:#FF4D018;color:#FF4D00">P:25g</span></div></div>
+    <div class="tip-box">💡 Caseína de digestão lenta — nutre músculos das pernas durante o sono de 7-9h.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="section-label" style="color:#FF4D00;margin-bottom:12px">REGRAS BASEADAS NO SEU EXAME</div>
+      <div style="font-family:'Barlow',sans-serif;font-size:12px;color:#777;line-height:1.8">
+        ✅ Proteína alta (185g/dia) — sua proteína corporal (13.2kg) precisa aumentar<br>
+        ✅ Carboidratos nos dias de treino de pernas — músculo precisa de energia<br>
+        ✅ Ômega-3 diário (salmão/atum) — reduz inflamação concentrada no tronco<br>
+        ⚠️ Não force mais déficit — 14.3% de gordura já é excelente para homem<br>
+        ❌ Álcool bloqueia síntese proteica e aumenta gordura visceral<br>
+        ❌ Ultra-processados — sódio excessivo causa retenção no tronco<br>
+        💧 3-4L de água/dia — seu WHR de 0.85 melhora com boa hidratação
+      </div>
+    </div>
+  </div>
+
+</div><!-- /alimentacao -->
+
+
+<!-- ══════════════════ GUIA ══════════════════ -->
+<div id="page-guia" class="page">
+
+  <div style="margin-bottom:18px">
+    <div class="section-label" style="color:#00FF88">PROTOCOLO 3 MESES</div>
+    <div class="title">GUIA<br><span style="color:#00FF88">CIENTÍFICO</span></div>
+    <div style="font-family:'Barlow',sans-serif;color:#555;font-size:12px;line-height:1.6">Baseado nos dados reais da Relaxmedic. Foco: <span style="color:#FF4D00">tronco menos gordo</span> + <span style="color:#8B00FF">pernas mais fortes</span></div>
+  </div>
+
+  <!-- Mês 1 -->
+  <div class="guide-card">
+    <div class="guide-header" style="background:#FF4D0015;border-bottom:1px solid #FF4D0030">
+      <div class="guide-mes" style="color:#FF4D00">MÊS 1 · SEMANA 1-4</div>
+      <div class="guide-title">🏗️ FUNDAÇÃO</div>
+      <div class="guide-meta">Meta: -0.8kg gordura tronco · +0.5kg músculo pernas</div>
+    </div>
+    <div class="guide-body">
+      <div class="guide-section-lbl" style="color:#FF4D00">🔥 QUEIMAR GORDURA DO TRONCO</div>
+      <div class="guide-item"><div class="guide-num" style="background:#FF4D0018;color:#FF4D00">1</div><div class="guide-txt">Déficit calórico de 300 kcal/dia — você já está em 14.3%, déficit maior causa perda muscular</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#FF4D0018;color:#FF4D00">2</div><div class="guide-txt">HIIT 2-3x/semana: burpees, mountain climbers e cardio focados no tronco</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#FF4D0018;color:#FF4D00">3</div><div class="guide-txt">Elimine açúcar refinado e álcool — ambos aumentam gordura visceral e abdominal</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#FF4D0018;color:#FF4D00">4</div><div class="guide-txt">Beba 3-4L de água/dia — reduz retenção hídrica e inchaço no tronco</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#FF4D0018;color:#FF4D00">5</div><div class="guide-txt">Durma 7-9h: cortisol elevado deposita gordura especificamente no abdômen</div></div>
+      <div class="divider"></div>
+      <div class="guide-section-lbl" style="color:#8B00FF">🦵 DESENVOLVER MÚSCULO NAS PERNAS</div>
+      <div class="guide-item"><div class="guide-num" style="background:#8B00FF18;color:#8B00FF">1</div><div class="guide-txt">FOCO EM PERNAS: seus braços (104%) e tronco muscular (103%) já estão ótimos</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#8B00FF18;color:#8B00FF">2</div><div class="guide-txt">Volume de pernas: 20-25 séries/semana — acima da média recomendada</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#8B00FF18;color:#8B00FF">3</div><div class="guide-txt">Proteína mínima: 185g/dia = 2.4g/kg para recomposição corporal eficiente</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#8B00FF18;color:#8B00FF">4</div><div class="guide-txt">Creatina 5g/dia — especialmente eficaz para ganho em membros inferiores</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#8B00FF18;color:#8B00FF">5</div><div class="guide-txt">Progressive overload nas pernas: aumente 2-2.5kg por semana nos exercícios compostos</div></div>
+    </div>
+  </div>
+
+  <!-- Mês 2 -->
+  <div class="guide-card">
+    <div class="guide-header" style="background:#00C6FF15;border-bottom:1px solid #00C6FF30">
+      <div class="guide-mes" style="color:#00C6FF">MÊS 2 · SEMANA 5-8</div>
+      <div class="guide-title">🚀 ACELERAÇÃO</div>
+      <div class="guide-meta">Meta: -1.2kg gordura tronco · +0.8kg músculo pernas</div>
+    </div>
+    <div class="guide-body">
+      <div class="guide-section-lbl" style="color:#FF4D00">🔥 QUEIMAR GORDURA DO TRONCO</div>
+      <div class="guide-item"><div class="guide-num" style="background:#FF4D0018;color:#FF4D00">1</div><div class="guide-txt">Intensifique HIIT para 25-30min, 3x/semana com movimentos que envolvam o core</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#FF4D0018;color:#FF4D00">2</div><div class="guide-txt">10.000 passos/dia (NEAT) — caminhada queima calorias do tronco continuamente</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#FF4D0018;color:#FF4D00">3</div><div class="guide-txt">Ciclismo de carboidratos: mais carbs nos dias de treino de pernas, menos no descanso</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#FF4D0018;color:#FF4D00">4</div><div class="guide-txt">Chá verde 2x/dia + gengibre — catequinas ajudam na queima abdominal</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#FF4D0018;color:#FF4D00">5</div><div class="guide-txt">Meça cintura a cada 14 dias — compare com WHR 0.85 atual</div></div>
+      <div class="divider"></div>
+      <div class="guide-section-lbl" style="color:#8B00FF">🦵 DESENVOLVER MÚSCULO NAS PERNAS</div>
+      <div class="guide-item"><div class="guide-num" style="background:#8B00FF18;color:#8B00FF">1</div><div class="guide-txt">Introduza drop-set, rest-pause e super-set especificamente nos exercícios de perna</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#8B00FF18;color:#8B00FF">2</div><div class="guide-txt">Agachamento Búlgaro pesado — máximo estímulo unilateral para equilíbrio</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#8B00FF18;color:#8B00FF">3</div><div class="guide-txt">Mantenha proteína alta mesmo nos dias de descanso: 185g/dia</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#8B00FF18;color:#8B00FF">4</div><div class="guide-txt">Descanse 48-72h entre treinos de pernas — elas precisam de mais recuperação</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#8B00FF18;color:#8B00FF">5</div><div class="guide-txt">Anote cargas no agachamento e leg press semanalmente — acompanhe evolução</div></div>
+    </div>
+  </div>
+
+  <!-- Mês 3 -->
+  <div class="guide-card">
+    <div class="guide-header" style="background:#00FF8815;border-bottom:1px solid #00FF8830">
+      <div class="guide-mes" style="color:#00FF88">MÊS 3 · SEMANA 9-12</div>
+      <div class="guide-title">⚡ FORÇA MÁXIMA</div>
+      <div class="guide-meta">Meta: -0.8kg gordura tronco · +0.5kg músculo · 5RM máximo</div>
+    </div>
+    <div class="guide-body">
+      <div class="guide-section-lbl" style="color:#FF4D00">🔥 QUEIMAR GORDURA DO TRONCO</div>
+      <div class="guide-item"><div class="guide-num" style="background:#FF4D0018;color:#FF4D00">1</div><div class="guide-txt">Déficit ajustado 350-400 kcal — preserve o músculo das pernas que construiu</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#FF4D0018;color:#FF4D00">2</div><div class="guide-txt">Cardio em jejum 20-25min zona 2, 2-3x/semana (opcional)</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#FF4D0018;color:#FF4D00">3</div><div class="guide-txt">Reduza carboidratos simples à noite — mantenha os complexos nos treinos pesados</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#FF4D0018;color:#FF4D00">4</div><div class="guide-txt">Cafeína 200mg pré-HIIT potencializa mobilização de gordura abdominal</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#FF4D0018;color:#FF4D00">5</div><div class="guide-txt">Meta final: gordura tronco de 5.3kg para ≤4.3kg — totalmente viável em 90 dias</div></div>
+      <div class="divider"></div>
+      <div class="guide-section-lbl" style="color:#8B00FF">🦵 DESENVOLVER MÚSCULO NAS PERNAS</div>
+      <div class="guide-item"><div class="guide-num" style="background:#8B00FF18;color:#8B00FF">1</div><div class="guide-txt">Semanas de força 5×5 — carga máxima no agachamento, deadlift e leg press</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#8B00FF18;color:#8B00FF">2</div><div class="guide-txt">Mantenha o volume mesmo em déficit — não caia na armadilha de reduzir carga</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#8B00FF18;color:#8B00FF">3</div><div class="guide-txt">Proteína ainda maior: 2.5g/kg nas semanas de maior déficit</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#8B00FF18;color:#8B00FF">4</div><div class="guide-txt">Refaça bioimpedância Relaxmedic ao final — compare com os dados de hoje</div></div>
+      <div class="guide-item"><div class="guide-num" style="background:#8B00FF18;color:#8B00FF">5</div><div class="guide-txt">Planeje próximo ciclo: recomposição completa estimada em 6-9 meses total</div></div>
+    </div>
+  </div>
+
+  <!-- Suplementação -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-body">
+      <div class="section-label" style="color:#FFB800;margin-bottom:12px">⚗️ SUPLEMENTAÇÃO (BASEADA NO EXAME)</div>
+      <div class="supp-row">
+        <div><div class="supp-name">Creatina Monohidratada</div><div class="supp-why">⭐ Máxima prioridade — força e volume nas pernas</div></div>
+        <span class="supp-dose" style="background:#00FF8818;color:#00FF88">5g/dia</span>
+      </div>
+      <div class="supp-row">
+        <div><div class="supp-name">Whey Protein Isolado</div><div class="supp-why">Cobre déficit proteico para atingir 185g/dia</div></div>
+        <span class="supp-dose" style="background:#FF4D0018;color:#FF4D00">35g pós-treino</span>
+      </div>
+      <div class="supp-row">
+        <div><div class="supp-name">Ômega-3 (EPA/DHA)</div><div class="supp-why">Reduz inflamação abdominal — direto no seu problema</div></div>
+        <span class="supp-dose" style="background:#00C6FF18;color:#00C6FF">2-3g/dia</span>
+      </div>
+      <div class="supp-row">
+        <div><div class="supp-name">Cafeína</div><div class="supp-why">Performance + queima de gordura no HIIT</div></div>
+        <span class="supp-dose" style="background:#FFB80018;color:#FFB800">200mg pré-treino</span>
+      </div>
+      <div class="supp-row" style="border:none">
+        <div><div class="supp-name">Vitamina D3 + K2</div><div class="supp-why">Suporte hormonal e força muscular</div></div>
+        <span class="supp-dose" style="background:#88888818;color:#888">2000UI/dia</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reavaliação -->
+  <div class="card">
+    <div class="card-body">
+      <div class="section-label" style="color:#00C6FF;margin-bottom:12px">📅 QUANDO REAVALIAR</div>
+      <div class="reeval-row">
+        <div class="reeval-time" style="background:#FF4D0018;border:1px solid #FF4D0040"><div class="reeval-time-val" style="color:#FF4D00">30 dias</div></div>
+        <div class="reeval-txt">Tire foto e meça cintura — compare com WHR 0.85</div>
+      </div>
+      <div class="reeval-row">
+        <div class="reeval-time" style="background:#FFB80018;border:1px solid #FFB80040"><div class="reeval-time-val" style="color:#FFB800">60 dias</div></div>
+        <div class="reeval-txt">Anote cargas no agachamento e leg press vs. semana 1</div>
+      </div>
+      <div class="reeval-row" style="border:none">
+        <div class="reeval-time" style="background:#00FF8818;border:1px solid #00FF8840"><div class="reeval-time-val" style="color:#00FF88">90 dias</div></div>
+        <div class="reeval-txt">Refaça bioimpedância Relaxmedic para comparar dados exatos</div>
+      </div>
+      <div style="margin-top:14px;background:#0a0a12;border-radius:8px;padding:10px 12px;font-family:'Barlow',sans-serif;font-size:11px;color:#555;line-height:1.6">
+        ⚠️ Suplementação é complementar à dieta. Consulte um nutricionista esportivo para ajustes finos baseados nos seus dados de bioimpedância.
+      </div>
+    </div>
+  </div>
+
+</div><!-- /guia -->
+
+</div><!-- /content -->
+
+<!-- BOTTOM NAV -->
+<div id="bottom-nav">
+  <button class="bnav-btn" onclick="showPage('home',null)">
+    <span class="bnav-icon active" id="bni-home">🏠</span>
+    <span class="bnav-lbl active" id="bnl-home">INÍCIO</span>
+  </button>
+  <button class="bnav-btn" onclick="showPage('treinos',null)">
+    <span class="bnav-icon" id="bni-treinos">💪</span>
+    <span class="bnav-lbl" id="bnl-treinos">TREINOS</span>
+  </button>
+  <button class="bnav-btn" onclick="showPage('alimentacao',null)">
+    <span class="bnav-icon" id="bni-alimentacao">🥗</span>
+    <span class="bnav-lbl" id="bnl-alimentacao">DIETA</span>
+  </button>
+  <button class="bnav-btn" onclick="showPage('guia',null)">
+    <span class="bnav-icon" id="bni-guia">📋</span>
+    <span class="bnav-lbl" id="bnl-guia">GUIA</span>
+  </button>
+</div>
+
+<script>
+  const PAGES = ['home','treinos','alimentacao','guia'];
+  let currentPage = 'home';
+
+  function showPage(id, btn) {
+    PAGES.forEach(p => {
+      document.getElementById('page-'+p).classList.remove('active');
+      document.getElementById('bni-'+p).classList.remove('active');
+      document.getElementById('bnl-'+p).classList.remove('active');
+    });
+    document.getElementById('page-'+id).classList.add('active');
+    document.getElementById('bni-'+id).classList.add('active');
+    document.getElementById('bnl-'+id).classList.add('active');
+    // top nav
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    currentPage = id;
+    window.scrollTo(0,0);
+  }
+
+  function toggleDay(id) {
+    const el = document.getElementById('ex-'+id);
+    el.classList.toggle('open');
+  }
+
+  const counts = {};
+  function toggleEx(row, dayId, total) {
+    const cb = row.querySelector('.cb');
+    const name = row.querySelector('.ex-name');
+    const isDone = cb.classList.toggle('done');
+    name.classList.toggle('done', isDone);
+    if(!counts[dayId]) counts[dayId] = 0;
+    counts[dayId] += isDone ? 1 : -1;
+    if(counts[dayId] < 0) counts[dayId] = 0;
+    const pct = Math.round(counts[dayId]/total*100);
+    document.getElementById('prog-'+dayId).style.width = pct+'%';
+    document.getElementById('txt-'+dayId).textContent = counts[dayId]+'/'+total+' exercícios'+(pct===100?' ✅':'');
+    const doneBar = document.getElementById('done-'+dayId);
+    if(doneBar) doneBar.style.display = pct===100 ? 'block' : 'none';
+  }
+
+  let bioOpen = false;
+  function toggleBio() {
+    bioOpen = !bioOpen;
+    document.getElementById('bio-detail').classList.toggle('open', bioOpen);
+    document.getElementById('bio-chevron').textContent = bioOpen ? '▲' : '▼';
+  }
+
+  function showWeek(id, btn) {
+    document.querySelectorAll('.week-content').forEach(w => w.style.display='none');
+    document.getElementById('week-'+id).style.display='block';
+    document.querySelectorAll('.week-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
